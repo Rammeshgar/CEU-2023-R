@@ -1,0 +1,62 @@
+---
+title: "NYC flights"
+output:
+  prettydoc::html_pretty:
+    theme: architect
+    highlight: github
+---
+
+# Analysing New york Flifgts Data Sets
+
+## Setup
+```{r message=FALSE, warning=FALSE}
+library(nycflights13)
+library(tidyverse)
+```
+
+## The Most Popular Airlines Names from JFK
+```{r warning=FALSE, message=FALSE}
+JFK_pops<-
+  flights %>% 
+  filter(origin=="JFK") %>% 
+  group_by(carrier) %>%
+  summarise(my_max=n()) %>% 
+  arrange(-my_max) %>% 
+  head(10)
+
+top_ten<-
+  merge(x = JFK_pops,y = airlines,by.x = "carrier",by.y = "carrier" ) %>% 
+  select(name, my_max)
+
+ggplot(top_ten, aes(my_max,reorder(name, my_max, decreasing=F)))+
+  geom_col(color= "blue", fill= "cyan4")+
+  theme_bw()+
+  labs(title = "Most popular airlines on JFK", x= "Most Flight", y= "Brands")
+```
+
+
+### Here Is The Data Set
+```{r warning=FALSE, message=FALSE}
+knitr::kable(JFK_pops)
+```
+
+
+## Arrival Delay and Distance by Carrier
+```{r warning=FALSE, message=FALSE}
+df <- flights %>% head(1000)
+
+my_df<-
+  df %>% 
+  select(arr_delay, distance, carrier)
+
+ggplot(my_df, aes(distance, arr_delay, color= carrier))+
+  geom_point()+
+  theme_bw()+
+  labs(title = "Arrival delay and distance by carrier", 
+       subtitle = "Theme=theme_bw, plot=geom_point"
+       , x= "Distance", y= "Arrival Delay")
+
+
+```
+
+
